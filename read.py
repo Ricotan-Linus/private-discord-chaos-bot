@@ -15,13 +15,7 @@ from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
 import slack
 
-SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
-
-aat = key.access_token
-
-slackch = key.slackch
-
-client = slack.WebClient(token=SLACK_BOT_TOKEN)
+# SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 
 def SearchImage():
@@ -42,15 +36,20 @@ def QRreade(image):
 
 def get_shortenURL(longUrl):
     url = 'https://api-ssl.bitly.com/v3/shorten'
-    access_token = aat
-    query = {'access_token': access_token, 'longurl': longUrl}
+    access_token = key.access_token
+    query = {
+        'access_token': access_token,
+        'longurl': longUrl,
+    }
     r = requests.get(url, params=query).json()
     return r
 
 
 def post():
-    response = client.chat_postMessage(channel=slackch, text=card)
+    slackch = key.slackch
 
+    client = slack.WebClient(token=SLACK_BOT_TOKEN)
+    response = client.chat_postMessage(channel=slackch, text=card)
 
 print("アイカツQRコードSlack送信システム")
 print('該当の画像があるパスを入れてください')
