@@ -131,6 +131,8 @@ URLのサポートは打ち切りました。"""
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
+        cv2.destroyAllWindows()
+
         if "http://aikatsu.com/qr/id=" in path or "AK" in path:
             print(
                 """旧カツのカードは対応していません。別のカードを読み込んでください。
@@ -139,8 +141,6 @@ URLのサポートは打ち切りました。"""
             )
             path = None
             continue
-
-        cv2.destroyAllWindows()
 
         if "http://dcd.sc/" not in path:
             try:
