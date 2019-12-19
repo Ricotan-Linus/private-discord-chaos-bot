@@ -122,17 +122,12 @@ def app():
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
-        if "http://aikatsu.com/qr/id=" in path:
-            print("旧カツのカードは対応していません。別のカードを読み込んでください。")
-            print("該当の画像を入れてください")
-            print("終了する場合はexitまたはCtrl+Dでお願いします")
-            path = None
-            continue
-
-        if "AK" in path:
-            print("旧カツのカードは対応していません。別のカードを読み込んでください。")
-            print("該当の画像を入れてください")
-            print("終了する場合はexitまたはCtrl+Dでお願いします")
+        if "http://aikatsu.com/qr/id=" in path or "AK" in path:
+            print(
+                """旧カツのカードは対応していません。別のカードを読み込んでください。
+該当の画像を入れてください
+終了する場合はexitまたはCtrl+Dでお願いします"""
+            )
             path = None
             continue
 
