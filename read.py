@@ -90,6 +90,7 @@ def get_path():
             else:
                 print("リトライしてください")
                 continue
+        return path
 
 
 def app():
