@@ -52,17 +52,7 @@ def post(card):
     response = client.chat_postMessage(channel=slackch, text=card)
 
 
-
-def main():
-    print(
-        """アイカツQRコードSlack送信システム
-該当の画像があるパスを入れてください
-QRを読み取る場合はQR-Readと入れてください
-カメラが起動します
-終了する場合はexitまたはCtrl+Dでお願いします
-URLのサポートは打ち切りました。"""
-    )
-
+def get_path():
     while True:
         try:
             path = input()
@@ -100,6 +90,11 @@ URLのサポートは打ち切りました。"""
             else:
                 print("リトライしてください")
                 continue
+
+
+def app():
+    while True:
+        path = get_path()
 
         if "QR" in path:
             window_name = "main"
@@ -189,6 +184,23 @@ URLのサポートは打ち切りました。"""
 
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
+
+
+
+
+
+def main():
+    print(
+        """アイカツQRコードSlack送信システム
+該当の画像があるパスを入れてください
+QRを読み取る場合はQR-Readと入れてください
+カメラが起動します
+終了する場合はexitまたはCtrl+Dでお願いします
+URLのサポートは打ち切りました。"""
+    )
+
+    return app()
+
 
 if __name__ == '__main__':
     main()
