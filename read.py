@@ -51,105 +51,47 @@ def post():
     client = slack.WebClient(token=SLACK_BOT_TOKEN)
     response = client.chat_postMessage(channel=slackch, text=card)
 
-print("アイカツQRコードSlack送信システム")
-print('該当の画像があるパスを入れてください')
-print("QRを読み取る場合はQR-Readと入れてください")
-print("カメラが起動します")
-print("終了する場合はexitまたはCtrl+Dでお願いします")
-print("URLのサポートは打ち切りました。")
 
-while True:
-    try:
-        path = input()
-    except UnicodeDecodeError:
-        print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-        sys.exit()
 
-    path = path.strip()
+def main():
+    print(
+        """アイカツQRコードSlack送信システム
+該当の画像があるパスを入れてください
+QRを読み取る場合はQR-Readと入れてください
+カメラが起動します
+終了する場合はexitまたはCtrl+Dでお願いします
+URLのサポートは打ち切りました。"""
+    )
 
-    if "exit" in path:
-        exit()
-
-    domein = pathlib.Path(path)
-    domein = domein.suffix.lower()
-    if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
-    if domein in if_suffix:
-        pass
-    elif "QR" in path:
-        pass
-    else:
-        print("これ画像じゃないですよね...")
-        print("再実行しますか？[Y/N]")
+    while True:
         try:
-            retry = input()
+            path = input()
         except UnicodeDecodeError:
             print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
             sys.exit()
-        except EOFError:
-            print("不正な文字列を入れてませんか？？？")
-            sys.exit()
-        if retry.lower() in y:
-            continue
-        elif retry.lower() in n:
-            break
+
+        path = path.strip()
+
+        if "exit" in path:
+            exit()
+
+        domein = pathlib.Path(path)
+        domein = domein.suffix.lower()
+        if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
+        if domein in if_suffix:
+            pass
+        elif "QR" in path:
+            pass
         else:
-            print("リトライしてください")
-            continue
-
-    if "QR" in path:
-        window_name = "main"
-        cap = cv2.VideoCapture(0)
-        cap.set(3, 1280)
-        cap.set(4, 720)
-        cap.set(5, 15)
-        cv2.namedWindow(window_name)
-
-        while True:
-            ret, flame = cap.read()
-            cv2.imshow(window_name, flame)
-            tresh = 100
-            max_pixel = 255
-            ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
-            qr_result = pyzbar.decode(flame)
-            if qr_result != []:
-                path = qr_result[0][0].decode('utf-8', 'ignore')
-                print(path)
-                if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
-                    print("アイカツ以外のカードは読み込めません。悪しからず。")
-                    sys.exit()
-                break
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    if "http://aikatsu.com/qr/id=" in path:
-        print("旧カツのカードは対応していません。別のカードを読み込んでください。")
-        print("該当の画像を入れてください")
-        print("終了する場合はexitまたはCtrl+Dでお願いします")
-        path = "none"
-        continue
-
-    if "AK" in path:
-        print("旧カツのカードは対応していません。別のカードを読み込んでください。")
-        print("該当の画像を入れてください")
-        print("終了する場合はexitまたはCtrl+Dでお願いします")
-        path = "none"
-        continue
-
-    cv2.destroyAllWindows()
-
-    if "http://dcd.sc/" not in path:
-        try:
-            read = decode(Image.open(path))
-        except FileNotFoundError:
-            print("本当にそこにありますか？？？")
+            print("これ画像じゃないですよね...")
             print("再実行しますか？[Y/N]")
             try:
                 retry = input()
-            except EOFError:
-                print("不正な文字列を入れてませんか？？？")
-                sys.exit()
             except UnicodeDecodeError:
                 print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
+                sys.exit()
+            except EOFError:
+                print("不正な文字列を入れてませんか？？？")
                 sys.exit()
             if retry.lower() in y:
                 continue
@@ -158,33 +100,99 @@ while True:
             else:
                 print("リトライしてください")
                 continue
-        except OSError:
-            print("画像ファイルに見せかけた不正なファイルを読み込ませないでください")
-            print("強制終了します")
-            sys.exit()
 
-        path = read[0][0].decode('utf-8', 'ignore')
+        if "QR" in path:
+            window_name = "main"
+            cap = cv2.VideoCapture(0)
+            cap.set(3, 1280)
+            cap.set(4, 720)
+            cap.set(5, 15)
+            cv2.namedWindow(window_name)
 
-    path = get_shortenURL(path)
+            while True:
+                ret, flame = cap.read()
+                cv2.imshow(window_name, flame)
+                tresh = 100
+                max_pixel = 255
+                ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
+                qr_result = pyzbar.decode(flame)
+                if qr_result != []:
+                    path = qr_result[0][0].decode('utf-8', 'ignore')
+                    print(path)
+                    if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
+                        print("アイカツ以外のカードは読み込めません。悪しからず。")
+                        sys.exit()
+                    break
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
-    print(path)
+        if "http://aikatsu.com/qr/id=" in path:
+            print("旧カツのカードは対応していません。別のカードを読み込んでください。")
+            print("該当の画像を入れてください")
+            print("終了する場合はexitまたはCtrl+Dでお願いします")
+            path = "none"
+            continue
 
-    try:
-        card = path['data']['url']
-    except TypeError:
-        print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
+        if "AK" in path:
+            print("旧カツのカードは対応していません。別のカードを読み込んでください。")
+            print("該当の画像を入れてください")
+            print("終了する場合はexitまたはCtrl+Dでお願いします")
+            path = "none"
+            continue
+
+        cv2.destroyAllWindows()
+
+        if "http://dcd.sc/" not in path:
+            try:
+                read = decode(Image.open(path))
+            except FileNotFoundError:
+                print("本当にそこにありますか？？？")
+                print("再実行しますか？[Y/N]")
+                try:
+                    retry = input()
+                except EOFError:
+                    print("不正な文字列を入れてませんか？？？")
+                    sys.exit()
+                except UnicodeDecodeError:
+                    print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
+                    sys.exit()
+                if retry.lower() in y:
+                    continue
+                elif retry.lower() in n:
+                    break
+                else:
+                    print("リトライしてください")
+                    continue
+            except OSError:
+                print("画像ファイルに見せかけた不正なファイルを読み込ませないでください")
+                print("強制終了します")
+                sys.exit()
+
+            path = read[0][0].decode('utf-8', 'ignore')
+
+        path = get_shortenURL(path)
+
+        print(path)
+
+        try:
+            card = path['data']['url']
+        except TypeError:
+            print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
+            print("該当の画像を入れてください")
+            print("終了する場合はexitまたはCtrl+Dでお願いします")
+            path = "none"
+            continue
+
+        post()
+
+        card = "none"
+
+        image = "none"
+
+        path = "none"
+
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
-        path = "none"
-        continue
 
-    post()
-
-    card = "none"
-
-    image = "none"
-
-    path = "none"
-
-    print("該当の画像を入れてください")
-    print("終了する場合はexitまたはCtrl+Dでお願いします")
+if __name__ == '__main__':
+    main()
