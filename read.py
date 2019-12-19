@@ -45,7 +45,7 @@ def get_shortenURL(longUrl):
     return r
 
 
-def post():
+def post(card):
     slackch = key.slackch
 
     client = slack.WebClient(token=SLACK_BOT_TOKEN)
@@ -183,7 +183,7 @@ URLのサポートは打ち切りました。"""
             path = "none"
             continue
 
-        post()
+        post(card)
 
         card = "none"
 
