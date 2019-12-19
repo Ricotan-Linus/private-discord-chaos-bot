@@ -86,16 +86,16 @@ URLのサポートは打ち切りました。"""
             print("これ画像じゃないですよね...")
             print("再実行しますか？[Y/N]")
             try:
-                retry = input()
+                retry = input().strip().lower()
             except UnicodeDecodeError:
                 print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
                 sys.exit()
             except EOFError:
                 print("不正な文字列を入れてませんか？？？")
                 sys.exit()
-            if retry.lower() in y:
+            if retry == 'y':
                 continue
-            elif retry.lower() in n:
+            elif retry == 'n':
                 break
             else:
                 print("リトライしてください")
