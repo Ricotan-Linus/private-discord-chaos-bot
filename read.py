@@ -75,10 +75,10 @@ URLのサポートは打ち切りました。"""
         if "exit" in path:
             exit()
 
-        domein = pathlib.Path(path)
-        domein = domein.suffix.lower()
+        domain = pathlib.Path(path)
+        domain = domain.suffix.lower()
         if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
-        if domein in if_suffix:
+        if domain in if_suffix:
             pass
         elif "QR" in path:
             pass
