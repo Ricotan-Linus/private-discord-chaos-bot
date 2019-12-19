@@ -93,7 +93,16 @@ def get_path():
         return path
 
 
-def app():
+def main():
+    print(
+        """アイカツQRコードSlack送信システム
+該当の画像があるパスを入れてください
+QRを読み取る場合はQR-Readと入れてください
+カメラが起動します
+終了する場合はexitまたはCtrl+Dでお願いします
+URLのサポートは打ち切りました。"""
+    )
+
     while True:
         path = get_path()
 
@@ -180,22 +189,6 @@ def app():
 
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
-
-
-
-
-
-def main():
-    print(
-        """アイカツQRコードSlack送信システム
-該当の画像があるパスを入れてください
-QRを読み取る場合はQR-Readと入れてください
-カメラが起動します
-終了する場合はexitまたはCtrl+Dでお願いします
-URLのサポートは打ち切りました。"""
-    )
-
-    return app()
 
 
 if __name__ == '__main__':
