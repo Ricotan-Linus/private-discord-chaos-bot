@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import requests
 import json
 import time
 import sys
@@ -13,9 +12,10 @@ import path
 from PIL import Image
 from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
+import requests
 import slack
 
-# SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
+SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 
 def SearchImage():
