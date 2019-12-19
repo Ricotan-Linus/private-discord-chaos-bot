@@ -130,14 +130,14 @@ URLのサポートは打ち切りました。"""
             print("旧カツのカードは対応していません。別のカードを読み込んでください。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
-            path = "none"
+            path = None
             continue
 
         if "AK" in path:
             print("旧カツのカードは対応していません。別のカードを読み込んでください。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
-            path = "none"
+            path = None
             continue
 
         cv2.destroyAllWindows()
@@ -180,16 +180,12 @@ URLのサポートは打ち切りました。"""
             print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
-            path = "none"
+            path = None
             continue
 
         post(card)
 
-        card = "none"
-
-        image = "none"
-
-        path = "none"
+        card = image = path = None
 
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
