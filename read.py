@@ -1,19 +1,19 @@
 # -*- coding: UTF-8 -*-
-from pyzbar.pyzbar import decode
-from PIL import Image
+
 import os
-import slack
 import requests
 import json
-import pprint
 import time
 import sys
-import key
-import cv2
-import pyzbar.pyzbar as pyzbar
-import PIL.Image
 import pathlib
+
+import cv2
+import key
 import path
+from PIL import Image
+from pyzbar import pyzbar
+from pyzbar.pyzbar import decode
+import slack
 
 SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
