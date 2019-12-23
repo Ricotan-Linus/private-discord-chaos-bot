@@ -19,10 +19,11 @@ SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 
 def SearchImage():
-    homeDir = expanduser('~')
+    homeDir = expanduser('~')  # これなに?
     imageDir = pathlib.Path(homeDir) / "Pictures"/"Camera Roll"
     imageList = os.listdir(imageDir)  # pathlibでたぶん同じのあるけど、とりあえずそのままに
-    return (imageDir + '\\' + imageList[-1])
+    out_path =os.path.join(imageDir,imageList[-1])  # strに変換するのめんどいのでos.pathで
+    return (out_path)
 
 
 def QRreader(image):
@@ -64,12 +65,19 @@ def get_path():
 
         if "exit" in path:
             sys.exit(0)  # 正常終了時は0
-
+            
+        # 存在確認するべき
         domain = pathlib.Path(path)
         domain = domain.suffix.lower()
         if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
         if domain in if_suffix:
-            pass
+            fileformat = image_checker(path,open_flag=True)
+            if not isinstance(fileformat,type(None)):
+                pass
+            else:
+                print("画像が壊れている、または画像ではないファイルです")
+                print("違うファイルまたはexitを入力してください")
+                continue
         elif "QR" in path:
             pass
         else:
@@ -139,7 +147,7 @@ URLのサポートは打ち切りました。"""
 該当の画像を入れてください
 終了する場合はexitまたはCtrl+Dでお願いします"""
             )
-            path = None
+            del path
             continue
 
         if "http://dcd.sc/" not in path:
@@ -180,16 +188,93 @@ URLのサポートは打ち切りました。"""
             print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
-            path = None
+            del path
             continue
 
         post(card)
 
-        card = image = path = None
+        card = image = path = None  # 変数imageが無いのだけど...
+
 
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
 
+
+def image_first_checker(file_path):
+    """
+    pathを入れると画像かどうか見てくれる関数。
+    最初の数バイトしか見てない為、中身が壊れていたとしても識別できない。
+    
+    Args:
+        file_path (str or pathlib.Path): 画像ファイルのpath
+    Returns:
+        imgtype (str): Noneだったら画像じゃなさそう
+    """
+    size = os.path.getsize(file_path)
+    with open(file_path) as input:
+        
+        data = input.read(26)
+    
+        if (size >= 10) and data[:6] in (b'GIF87a', b'GIF89a'):
+            # GIFs
+            imgtype = "GIF"
+    
+        elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
+              and (data[12:16] == b'IHDR')):
+            # PNGs
+            imgtype = "PNG"
+    
+        elif (size >= 16) and data.startswith(b'\211PNG\r\n\032\n'):
+            # older PNGs
+            imgtype = "PNG"
+    
+        elif (size >= 2) and data.startswith(b'\377\330'):
+            # JPEG
+            imgtype = "JPEG"
+    
+        elif (size >= 26) and data.startswith(b'BM'):
+            # BMP
+            imgtype = 'BMP'
+    
+        elif (size >= 8) and data[:4] in (b"II\052\000", b"MM\000\052"):
+            # Standard TIFF
+            imgtype = "TIFF"
+    
+        elif size >= 2:
+            # see http://en.wikipedia.org/wiki/ICO_(file_format)
+            imgtype = 'ICO'
+    
+        else:
+            imgtype = None
+
+    return imgtype
+
+
+def image_checker(file_path,open_flag=False):
+    """
+    pathを入れると画像かどうか見てくれる関数。
+    open_flagがfalseだと最初の数バイトしか見てない為、中身が壊れていたとしても識別できない。
+    open_flagがtrueだと中身もチェックするが、遅い。
+    
+    image_first_checkerじゃなくてこっち使って。
+
+    Args:
+        file_path (str or pathlib.Path): 画像ファイルのpath
+        open_flag (bool): falseだとimage_first_checkerのみ、trueだと実際に読み込んでみる
+    Returns:
+        imgtype (str): Noneだったら画像じゃなさそう
+    """
+    assert file_path is not None
+    
+    imgtype = image_first_checker(file_path)
+    if open_flag and not isinstance(imgtype,type(None)):
+        try:
+            hoge = Image.open(file_path)
+            
+        except:  # 可能な限り想定される例外型を指定したほうがいいがめんどいのですべての例外で
+            imgtype = None
+        
+    return imgtype
 
 if __name__ == '__main__':
     main()
