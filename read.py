@@ -8,7 +8,7 @@ import pathlib
 
 import cv2
 import key
-import path
+import path  # これなんだ?
 from PIL import Image
 from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
@@ -25,7 +25,7 @@ def SearchImage():
     return (imageDir + '\\' + imageList[-1])
 
 
-def QRreade(image):
+def QRreader(image):
     readResult = decode(Image.open(image))
     if (readResult != []):
         return readResult
@@ -58,12 +58,12 @@ def get_path():
             path = input()
         except UnicodeDecodeError:
             print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-            sys.exit()
+            sys.exit(1)  # 異常終了時は1
 
         path = path.strip()
 
         if "exit" in path:
-            exit()
+            sys.exit(0)  # 正常終了時は0
 
         domain = pathlib.Path(path)
         domain = domain.suffix.lower()
@@ -79,10 +79,10 @@ def get_path():
                 retry = input().strip().lower()
             except UnicodeDecodeError:
                 print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-                sys.exit()
+                sys.exit(1)  # 異常終了時は1
             except EOFError:
                 print("不正な文字列を入れてませんか？？？")
-                sys.exit()
+                sys.exit(1)  # 異常終了時は1
             if retry == 'y':
                 continue
             elif retry == 'n':
@@ -126,7 +126,7 @@ URLのサポートは打ち切りました。"""
                     print(path)
                     if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
                         print("アイカツ以外のカードは読み込めません。悪しからず。")
-                        sys.exit()
+                        sys.exit(0)  # 正常終了時は0
                     break
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -152,13 +152,13 @@ URLのサポートは打ち切りました。"""
                     retry = input()
                 except EOFError:
                     print("不正な文字列を入れてませんか？？？")
-                    sys.exit()
+                    sys.exit(1)  # 異常終了時は1
                 except UnicodeDecodeError:
                     print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-                    sys.exit()
-                if retry.lower() in y:
+                    sys.exit(1)  # 異常終了時は1
+                if retry.lower() == "y":
                     continue
-                elif retry.lower() in n:
+                elif retry.lower() == "n":
                     break
                 else:
                     print("リトライしてください")
@@ -166,7 +166,7 @@ URLのサポートは打ち切りました。"""
             except OSError:
                 print("画像ファイルに見せかけた不正なファイルを読み込ませないでください")
                 print("強制終了します")
-                sys.exit()
+                sys.exit(1)  # 異常終了時は1
 
             path = read[0][0].decode('utf-8', 'ignore')
 
