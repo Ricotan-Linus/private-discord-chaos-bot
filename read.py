@@ -22,11 +22,11 @@ def SearchImage():
     homeDir = expanduser('~')  # これなに?
     imageDir = pathlib.Path(homeDir) / "Pictures"/"Camera Roll"
     imageList = os.listdir(imageDir)  # pathlibでたぶん同じのあるけど、とりあえずそのままに
-    out_path =os.path.join(imageDir,imageList[-1])  # strに変換するのめんどいのでos.pathで
+    out_path =os.path.join(imageDir,imageList[-1])  # この後strに変換するのめんどいのでos.pathで
     return (out_path)
 
 
-def QRreader(image):
+def QRreader(image):  # つかってないよね
     readResult = decode(Image.open(image))
     if len(readResult) != 0:  # 配列が空でなかったら
         return readResult
@@ -116,31 +116,40 @@ URLのサポートは打ち切りました。"""
 
         if "QR" in path:
             window_name = "main"
-            cap = cv2.VideoCapture(0)
-            cap.set(3, 1280)
-            cap.set(4, 720)
-            cap.set(5, 15)
+            try:
+                cap = cv2.VideoCapture(0)
+                if cap.isOpened() is False:  # カメラが開けなかったら
+                    raise cv2.error
+            except cv2.error:
+                sys.exit(1)  # 異常終了という事を表すため通常とは違う値を設定
+            cap.set(cv2.CAP_PROP_FPS, 15)  # カメラFPSを15FPSに設定
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # カメラ画像の横幅を1280に設定
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)  # カメラ画像の縦幅を720に設定
             cv2.namedWindow(window_name)
-
-            while True:
-                ret, flame = cap.read()
-                cv2.imshow(window_name, flame)
-                tresh = 100
-                max_pixel = 255
-                ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
-                qr_result = pyzbar.decode(flame)
-                if qr_result != []:
-                    path = qr_result[0][0].decode('utf-8', 'ignore')
-                    print(path)
-                    if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
-                        print("アイカツ以外のカードは読み込めません。悪しからず。")
-                        sys.exit(0)  # 正常終了時は0
-                    break
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-        cv2.destroyAllWindows()
-
+            tresh = 100  # while内で毎回定義しているので引っ越し
+            max_pixel = 255  # 上と同じ
+            try:  # withでも良いけどクラス作って__exit__定義しなあかんからこっちでどうぞ
+                while 1:
+                    ret, flame = cap.read()
+                    cv2.imshow(window_name, flame)
+    
+                    ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
+                    qr_result = pyzbar.decode(flame)
+                    if qr_result != []:
+                        path = qr_result[0][0].decode('utf-8', 'ignore')
+                        print(path)
+                        if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
+                            print("アイカツ以外のカードは読み込めません。悪しからず。")
+                            cap.release()
+                            cv2.destroyAllWindows()
+                            sys.exit(0)  # 正常終了時は0
+                        break
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+            finally:  # 後片付け
+                cap.release()
+                cv2.destroyAllWindows()
+        
         if "http://aikatsu.com/qr/id=" in path or "AK" in path:
             print(
                 """旧カツのカードは対応していません。別のカードを読み込んでください。
