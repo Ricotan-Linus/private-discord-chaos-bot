@@ -20,13 +20,13 @@ SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 def SearchImage():
     homeDir = expanduser('~')  # これなに?
-    imageDir = pathlib.Path(homeDir) / "Pictures"/"Camera Roll"
+    imageDir = pathlib.Path(homeDir) / "Pictures" / "Camera Roll"
     imageList = os.listdir(imageDir)  # pathlibでたぶん同じのあるけど、とりあえずそのままに
-    out_path =os.path.join(imageDir,imageList[-1])  # この後strに変換するのめんどいのでos.pathで
+    out_path = os.path.join(imageDir,imageList[-1])  # この後strに変換するのめんどいのでos.pathで
     return (out_path)
 
 
-def QRreader(image):  # つかってないよね
+def QRreader(image):  # つかってない?
     readResult = decode(Image.open(image))
     if len(readResult) != 0:  # 配列が空でなかったら
         return readResult
@@ -69,7 +69,7 @@ def get_path():
         # 存在確認するべき
         domain = pathlib.Path(path)
         domain = domain.suffix.lower()
-        if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
+        if_suffix = ['.jpg', '.png', '.bmp', '.gif', '.tif', '.jpeg']
         if domain in if_suffix:
             fileformat = image_checker(path,open_flag=True)
             if not isinstance(fileformat,type(None)):
@@ -107,7 +107,7 @@ def main():
 該当の画像があるパスを入れてください
 QRを読み取る場合はQR-Readと入れてください
 カメラが起動します
-終了する場合はexitまたはCtrl+Dでお願いします
+終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします
 URLのサポートは打ち切りました。"""
     )
 
@@ -121,6 +121,7 @@ URLのサポートは打ち切りました。"""
                 if cap.isOpened() is False:  # カメラが開けなかったら
                     raise cv2.error
             except cv2.error:
+                print("カメラが開けません。")
                 sys.exit(1)  # 異常終了という事を表すため通常とは違う値を設定
             cap.set(cv2.CAP_PROP_FPS, 15)  # カメラFPSを15FPSに設定
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # カメラ画像の横幅を1280に設定
@@ -135,12 +136,12 @@ URLのサポートは打ち切りました。"""
     
                     ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
                     qr_result = pyzbar.decode(flame)
-                    if qr_result != []:
+                    if len(qr_result) != 0:
                         path = qr_result[0][0].decode('utf-8', 'ignore')
                         print(path)
                         if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
                             print("アイカツ以外のカードは読み込めません。悪しからず。")
-                            cap.release()
+                            cap.release()  # 後片付け
                             cv2.destroyAllWindows()
                             sys.exit(0)  # 正常終了時は0
                         break
@@ -154,9 +155,9 @@ URLのサポートは打ち切りました。"""
             print(
                 """旧カツのカードは対応していません。別のカードを読み込んでください。
 該当の画像を入れてください
-終了する場合はexitまたはCtrl+Dでお願いします"""
+終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします"""
             )
-            del path
+            del path  # 絶対に値が来るのでいらなくない?
             continue
 
         if "http://dcd.sc/" not in path:
@@ -203,10 +204,10 @@ URLのサポートは打ち切りました。"""
         post(card)
 
         card = image = path = None  # 変数imageが無いのだけど...
-
+        # いらなくない?
 
         print("該当の画像を入れてください")
-        print("終了する場合はexitまたはCtrl+Dでお願いします")
+        print("終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします")
 
 
 def image_first_checker(file_path):
