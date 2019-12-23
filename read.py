@@ -20,18 +20,18 @@ SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 def SearchImage():
     homeDir = expanduser('~')
-    imageDir = homeDir + '\\Pictures\\Camera Roll'
-    imageList = os.listdir(imageDir)
+    imageDir = pathlib.Path(homeDir) / "Pictures"/"Camera Roll"
+    imageList = os.listdir(imageDir)  # pathlibでたぶん同じのあるけど、とりあえずそのままに
     return (imageDir + '\\' + imageList[-1])
 
 
 def QRreader(image):
     readResult = decode(Image.open(image))
-    if (readResult != []):
+    if len(readResult) != 0:  # 配列が空でなかったら
         return readResult
     else:
         print('QRコードを検出できませんでした')
-        exit()
+        sys.exit(0)
 
 
 def get_shortenURL(longUrl):
