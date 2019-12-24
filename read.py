@@ -8,7 +8,7 @@ import pathlib
 
 import cv2
 import key
-import path  # これなんだ?
+import path
 from PIL import Image
 from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
@@ -19,20 +19,19 @@ SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
 
 def SearchImage():
-    homeDir = expanduser('~')  # これなに?
-    imageDir = pathlib.Path(homeDir) / "Pictures" / "Camera Roll"
-    imageList = os.listdir(imageDir)  # pathlibでたぶん同じのあるけど、とりあえずそのままに
-    out_path = os.path.join(imageDir,imageList[-1])  # この後strに変換するのめんどいのでos.pathで
-    return (out_path)
+    homeDir = expanduser('~')
+    imageDir = homeDir + '\\Pictures\\Camera Roll'
+    imageList = os.listdir(imageDir)
+    return (imageDir + '\\' + imageList[-1])
 
 
-def QRreader(image):  # つかってない?
+def QRreade(image):
     readResult = decode(Image.open(image))
-    if len(readResult) != 0:  # 配列が空でなかったら
+    if (readResult != []):
         return readResult
     else:
         print('QRコードを検出できませんでした')
-        sys.exit(0)
+        exit()
 
 
 def get_shortenURL(longUrl):
@@ -59,25 +58,18 @@ def get_path():
             path = input()
         except UnicodeDecodeError:
             print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-            sys.exit(1)  # 異常終了時は1
+            sys.exit()
 
         path = path.strip()
 
         if "exit" in path:
-            sys.exit(0)  # 正常終了時は0
-            
-        # 存在確認するべき
+            exit()
+
         domain = pathlib.Path(path)
         domain = domain.suffix.lower()
-        if_suffix = ['.jpg', '.png', '.bmp', '.gif', '.tif', '.jpeg']
+        if_suffix = ['.jpg', '.png', '.bmp', '.tif', '.jpeg']
         if domain in if_suffix:
-            fileformat = image_checker(path,open_flag=True)
-            if not isinstance(fileformat,type(None)):
-                pass
-            else:
-                print("画像が壊れている、または画像ではないファイルです")
-                print("違うファイルまたはexitを入力してください")
-                continue
+            pass
         elif "QR" in path:
             pass
         else:
@@ -87,10 +79,10 @@ def get_path():
                 retry = input().strip().lower()
             except UnicodeDecodeError:
                 print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-                sys.exit(1)  # 異常終了時は1
+                sys.exit()
             except EOFError:
                 print("不正な文字列を入れてませんか？？？")
-                sys.exit(1)  # 異常終了時は1
+                sys.exit()
             if retry == 'y':
                 continue
             elif retry == 'n':
@@ -107,7 +99,7 @@ def main():
 該当の画像があるパスを入れてください
 QRを読み取る場合はQR-Readと入れてください
 カメラが起動します
-終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします
+終了する場合はexitまたはCtrl+Dでお願いします
 URLのサポートは打ち切りました。"""
     )
 
@@ -116,48 +108,38 @@ URLのサポートは打ち切りました。"""
 
         if "QR" in path:
             window_name = "main"
-            try:
-                cap = cv2.VideoCapture(0)
-                if cap.isOpened() is False:  # カメラが開けなかったら
-                    raise cv2.error
-            except cv2.error:
-                print("カメラが開けません。")
-                sys.exit(1)  # 異常終了という事を表すため通常とは違う値を設定
-            cap.set(cv2.CAP_PROP_FPS, 15)  # カメラFPSを15FPSに設定
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # カメラ画像の横幅を1280に設定
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)  # カメラ画像の縦幅を720に設定
+            cap = cv2.VideoCapture(0)
+            cap.set(3, 1280)
+            cap.set(4, 720)
+            cap.set(5, 15)
             cv2.namedWindow(window_name)
-            tresh = 100  # while内で毎回定義しているので引っ越し
-            max_pixel = 255  # 上と同じ
-            try:  # withでも良いけどクラス作って__exit__定義しなあかんからこっちでどうぞ
-                while 1:
-                    ret, flame = cap.read()
-                    cv2.imshow(window_name, flame)
-    
-                    ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
-                    qr_result = pyzbar.decode(flame)
-                    if len(qr_result) != 0:
-                        path = qr_result[0][0].decode('utf-8', 'ignore')
-                        print(path)
-                        if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
-                            print("アイカツ以外のカードは読み込めません。悪しからず。")
-                            cap.release()  # 後片付け
-                            cv2.destroyAllWindows()
-                            sys.exit(0)  # 正常終了時は0
-                        break
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
-            finally:  # 後片付け
-                cap.release()
-                cv2.destroyAllWindows()
-        
+
+            while True:
+                ret, flame = cap.read()
+                cv2.imshow(window_name, flame)
+                tresh = 100
+                max_pixel = 255
+                ret, flame = cv2.threshold(flame, tresh, max_pixel, cv2.THRESH_BINARY)
+                qr_result = pyzbar.decode(flame)
+                if qr_result != []:
+                    path = qr_result[0][0].decode('utf-8', 'ignore')
+                    print(path)
+                    if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
+                        print("アイカツ以外のカードは読み込めません。悪しからず。")
+                        sys.exit()
+                    break
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+        cv2.destroyAllWindows()
+
         if "http://aikatsu.com/qr/id=" in path or "AK" in path:
             print(
                 """旧カツのカードは対応していません。別のカードを読み込んでください。
 該当の画像を入れてください
-終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします"""
+終了する場合はexitまたはCtrl+Dでお願いします"""
             )
-            del path  # 絶対に値が来るのでいらなくない?
+            path = None
             continue
 
         if "http://dcd.sc/" not in path:
@@ -170,13 +152,13 @@ URLのサポートは打ち切りました。"""
                     retry = input()
                 except EOFError:
                     print("不正な文字列を入れてませんか？？？")
-                    sys.exit(1)  # 異常終了時は1
+                    sys.exit()
                 except UnicodeDecodeError:
                     print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
-                    sys.exit(1)  # 異常終了時は1
-                if retry.lower() == "y":
+                    sys.exit()
+                if retry.lower() in 'y':
                     continue
-                elif retry.lower() == "n":
+                elif retry.lower() in 'n':
                     break
                 else:
                     print("リトライしてください")
@@ -184,7 +166,7 @@ URLのサポートは打ち切りました。"""
             except OSError:
                 print("画像ファイルに見せかけた不正なファイルを読み込ませないでください")
                 print("強制終了します")
-                sys.exit(1)  # 異常終了時は1
+                sys.exit()
 
             path = read[0][0].decode('utf-8', 'ignore')
 
@@ -198,93 +180,16 @@ URLのサポートは打ち切りました。"""
             print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
-            del path
+            path = None
             continue
 
         post(card)
 
-        card = image = path = None  # 変数imageが無いのだけど...
-        # いらなくない?
+        card = image = path = None
 
         print("該当の画像を入れてください")
-        print("終了する場合はexitまたはCtrl+D,Ctrl+Cでお願いします")
+        print("終了する場合はexitまたはCtrl+Dでお願いします")
 
-
-def image_first_checker(file_path):
-    """
-    pathを入れると画像かどうか見てくれる関数。
-    最初の数バイトしか見てない為、中身が壊れていたとしても識別できない。
-    
-    Args:
-        file_path (str or pathlib.Path): 画像ファイルのpath
-    Returns:
-        imgtype (str): Noneだったら画像じゃなさそう
-    """
-    size = os.path.getsize(file_path)
-    with open(file_path) as input:
-        
-        data = input.read(26)
-    
-        if (size >= 10) and data[:6] in (b'GIF87a', b'GIF89a'):
-            # GIFs
-            imgtype = "GIF"
-    
-        elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
-              and (data[12:16] == b'IHDR')):
-            # PNGs
-            imgtype = "PNG"
-    
-        elif (size >= 16) and data.startswith(b'\211PNG\r\n\032\n'):
-            # older PNGs
-            imgtype = "PNG"
-    
-        elif (size >= 2) and data.startswith(b'\377\330'):
-            # JPEG
-            imgtype = "JPEG"
-    
-        elif (size >= 26) and data.startswith(b'BM'):
-            # BMP
-            imgtype = 'BMP'
-    
-        elif (size >= 8) and data[:4] in (b"II\052\000", b"MM\000\052"):
-            # Standard TIFF
-            imgtype = "TIFF"
-    
-        elif size >= 2:
-            # see http://en.wikipedia.org/wiki/ICO_(file_format)
-            imgtype = 'ICO'
-    
-        else:
-            imgtype = None
-
-    return imgtype
-
-
-def image_checker(file_path,open_flag=False):
-    """
-    pathを入れると画像かどうか見てくれる関数。
-    open_flagがfalseだと最初の数バイトしか見てない為、中身が壊れていたとしても識別できない。
-    open_flagがtrueだと中身もチェックするが、遅い。
-    
-    image_first_checkerじゃなくてこっち使って。
-
-    Args:
-        file_path (str or pathlib.Path): 画像ファイルのpath
-        open_flag (bool): falseだとimage_first_checkerのみ、trueだと実際に読み込んでみる
-    Returns:
-        imgtype (str): Noneだったら画像じゃなさそう
-    """
-    assert file_path is not None
-    
-    imgtype = image_first_checker(file_path)
-    if open_flag and not isinstance(imgtype,type(None)):
-        try:
-            hoge = Image.open(file_path)
-            
-        except:  # 可能な限り想定される例外型を指定したほうがいいがめんどいのですべての例外で
-            imgtype = None
-        
-    return imgtype
 
 if __name__ == '__main__':
     main()
