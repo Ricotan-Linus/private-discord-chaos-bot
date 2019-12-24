@@ -156,9 +156,9 @@ URLのサポートは打ち切りました。"""
                 except UnicodeDecodeError:
                     print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
                     sys.exit()
-                if retry.lower() in y:
+                if retry.lower() in 'y':
                     continue
-                elif retry.lower() in n:
+                elif retry.lower() in 'n':
                     break
                 else:
                     print("リトライしてください")
