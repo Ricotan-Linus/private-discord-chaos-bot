@@ -1,11 +1,9 @@
 # -*- coding: UTF-8 -*-
-
 import os
 import json
 import time
 import sys
 import pathlib
-
 import cv2
 import key
 import path
@@ -57,7 +55,7 @@ def get_path():
         try:
             path = input()
         except UnicodeDecodeError:
-            print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
+            print("ファジングしようとするなあ！！")
             sys.exit()
 
         path = path.strip()
@@ -78,14 +76,14 @@ def get_path():
             try:
                 retry = input().strip().lower()
             except UnicodeDecodeError:
-                print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
+                print("ファジングしようとするなあ！！")
                 sys.exit()
             except EOFError:
                 print("不正な文字列を入れてませんか？？？")
                 sys.exit()
-            if retry == 'y':
+            if retry == 'y' not in "n":
                 continue
-            elif retry == 'n':
+            elif retry == 'n' not in "y":
                 break
             else:
                 print("リトライしてください")
@@ -95,12 +93,10 @@ def get_path():
 
 def main():
     print(
-        """アイカツQRコードSlack送信システム
+        """アイカツQRコード読み取り/Slack送信システム
 該当の画像があるパスを入れてください
-QRを読み取る場合はQR-Readと入れてください
-カメラが起動します
-終了する場合はexitまたはCtrl+Dでお願いします
-URLのサポートは打ち切りました。"""
+QRを読み取る場合はQRと入れてください
+終了する場合はexitまたはCtrl+Dでお願いします"""
     )
 
     while True:
@@ -111,7 +107,7 @@ URLのサポートは打ち切りました。"""
             cap = cv2.VideoCapture(0)
             cap.set(3, 1280)
             cap.set(4, 720)
-            cap.set(5, 15)
+            cap.set(5, 60)
             cv2.namedWindow(window_name)
 
             while True:
@@ -126,6 +122,9 @@ URLのサポートは打ち切りました。"""
                     print(path)
                     if "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" in path and "AK" in path:
                         print("アイカツ以外のカードは読み込めません。悪しからず。")
+                        sys.exit()
+                    elif "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" not in path and "AK" not in path:
+                        print("別の物を読み込もうとしていませんか？")
                         sys.exit()
                     break
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -154,11 +153,11 @@ URLのサポートは打ち切りました。"""
                     print("不正な文字列を入れてませんか？？？")
                     sys.exit()
                 except UnicodeDecodeError:
-                    print("ファジングしようとするなあ！！！！！！！！！！！！！！！！")
+                    print("ファジングしようとするなあ！！")
                     sys.exit()
-                if retry.lower() in 'y':
+                if retry.lower() in 'y' not in "n":
                     continue
-                elif retry.lower() in 'n':
+                elif retry.lower() in 'n'not in "y":
                     break
                 else:
                     print("リトライしてください")
