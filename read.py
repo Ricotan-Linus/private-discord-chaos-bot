@@ -55,7 +55,7 @@ def get_path():
         try:
             path = input()
         except UnicodeDecodeError:
-            print("ファジングしようとするなあ！！")
+            print("不正な文字を入力しようとしないでください。")
             sys.exit()
 
         path = path.strip()
@@ -71,15 +71,17 @@ def get_path():
         elif "QR" in path:
             pass
         else:
-            print("これ画像じゃないですよね...")
+            print(
+                """サポートされていない拡張子のファイルではないと判断されました。
+サポートされている拡張子はjpg/png/bmp/tif/jpegです""")
             print("再実行しますか？[Y/N]")
             try:
                 retry = input().strip().lower()
             except UnicodeDecodeError:
-                print("ファジングしようとするなあ！！")
+                print("不正な文字を入力しようとしないでください。")
                 sys.exit()
             except EOFError:
-                print("不正な文字列を入れてませんか？？？")
+                print("空のまま決定しないでください")
                 sys.exit()
             if retry == 'y' not in "n":
                 continue
@@ -134,7 +136,7 @@ QRを読み取る場合はQRと入れてください
 
         if "http://aikatsu.com/qr/id=" in path or "AK" in path:
             print(
-                """旧カツのカードは対応していません。別のカードを読み込んでください。
+                """旧カツのカードは対応していません。
 該当の画像を入れてください
 終了する場合はexitまたはCtrl+Dでお願いします"""
             )
@@ -150,10 +152,10 @@ QRを読み取る場合はQRと入れてください
                 try:
                     retry = input()
                 except EOFError:
-                    print("不正な文字列を入れてませんか？？？")
+                    print("空のまま決定しないでください。")
                     sys.exit()
                 except UnicodeDecodeError:
-                    print("ファジングしようとするなあ！！")
+                    print("不正な文字を入力しようとしないでください。")
                     sys.exit()
                 if retry.lower() in 'y' not in "n":
                     continue
@@ -163,8 +165,8 @@ QRを読み取る場合はQRと入れてください
                     print("リトライしてください")
                     continue
             except OSError:
-                print("画像ファイルに見せかけた不正なファイルを読み込ませないでください")
-                print("強制終了します")
+                print("不正なファイルのため読み込めません。")
+                print("強制終了します。")
                 sys.exit()
 
             path = read[0][0].decode('utf-8', 'ignore')
@@ -176,7 +178,7 @@ QRを読み取る場合はQRと入れてください
         try:
             card = path['data']['url']
         except TypeError:
-            print("旧カツカードまたは読み込めない形式のカードです、別のカードを読み込んでください。")
+            print("旧カツカードまたは読み込めない形式のカードです。")
             print("該当の画像を入れてください")
             print("終了する場合はexitまたはCtrl+Dでお願いします")
             path = None
