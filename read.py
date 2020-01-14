@@ -12,6 +12,8 @@ from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
 import requests
 import slack
+from bs4 import BeautifulSoup
+import unicodedata
 
 SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
 
@@ -41,6 +43,12 @@ def get_shortenURL(longUrl):
     }
     r = requests.get(url, params=query).json()
     return r
+
+
+def SPOST(RN):
+    slackch = key.slackch
+    client = slack.WebClient(token=SLACK_BOT_TOKEN)
+    response = client.chat_postMessage(channel=slackch, text=RN)
 
 
 def post(card):
@@ -128,6 +136,22 @@ QRを読み取る場合はQRと入れてください
                     elif "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" not in path and "AK" not in path:
                         print("別の物を読み込もうとしていませんか？")
                         sys.exit()
+                    else:
+                        target_url = path
+                        r = requests.get(target_url) 
+                        soup = BeautifulSoup(r.text, 'lxml')
+                        try:
+                            NR = soup.find("dd", class_="cardNum").get_text()
+                            RR = soup.find("dd", class_="cardName").get_text()
+                            print(NR)
+                            print(RR)
+                            RN = NR + "_" + RR
+                            print(RN)
+                        except AttributeError:
+                            print("カード名取得失敗です。学生証またはアイカツスターズ!のカードだと思われます。")
+                            RN = "カード名取得失敗です。学生証またはアイカツスターズ!のカードだと思われます。"
+                            pass
+                        
                     break
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -183,10 +207,12 @@ QRを読み取る場合はQRと入れてください
             print("終了する場合はexitまたはCtrl+Dでお願いします")
             path = None
             continue
-
+        
+        SPOST(RN)
+    
         post(card)
 
-        card = image = path = None
+        card = image = path = RN = RR = NR = None
 
         print("該当の画像を入れてください")
         print("終了する場合はexitまたはCtrl+Dでお願いします")
