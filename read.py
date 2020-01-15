@@ -65,6 +65,8 @@ def get_path():
         except UnicodeDecodeError:
             print("不正な文字を入力しようとしないでください。")
             sys.exit()
+        except EOFError:
+            sys.exit()
 
         path = path.strip()
 
@@ -136,20 +138,31 @@ QRを読み取る場合はQRと入れてください
                     elif "http://dcd.sc/" not in path and "http://aikatsu.com/qr/id=" not in path and "AK" not in path:
                         print("別の物を読み込もうとしていませんか？")
                         sys.exit()
-                    else:
+                    elif "http://dcd.sc/n2" in path:
                         target_url = path
                         r = requests.get(target_url) 
                         soup = BeautifulSoup(r.text, 'lxml')
                         try:
                             NR = soup.find("dd", class_="cardNum").get_text()
                             RR = soup.find("dd", class_="cardName").get_text()
-                            print(NR)
-                            print(RR)
                             RN = NR + "_" + RR
                             print(RN)
                         except AttributeError:
-                            print("カード名取得失敗です。学生証またはアイカツスターズ!のカードだと思われます。")
-                            RN = "カード名取得失敗です。学生証またはアイカツスターズ!のカードだと思われます。"
+                            print("カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。")
+                            RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+                            pass
+                    elif "http://dcd.sc/j2" in path:
+                        target_url = path
+                        r = requests.get(target_url) 
+                        soup = BeautifulSoup(r.text, 'lxml')
+                        try:
+                            NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
+                            print(NR)
+                            RN = NR
+                            print(RN)
+                        except AttributeError:
+                            print("カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。")
+                            RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
                             pass
                         
                     break
@@ -208,7 +221,9 @@ QRを読み取る場合はQRと入れてください
             path = None
             continue
         
-        SPOST(RN)
+        card = RN + "\n" + card
+        
+        #SPOST(RN)
     
         post(card)
 

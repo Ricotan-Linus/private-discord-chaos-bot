@@ -1,6 +1,7 @@
 pyzbar==0.1.8
-requests==2.22.0
 opencv_contrib_python==4.1.2.30
+requests==2.22.0
+beautifulsoup4==4.8.2
 path.py==12.4.0
 Pillow==7.0.0
 slackclient==2.5.0
