@@ -159,11 +159,18 @@ QRを読み取る場合はQRと入れてください
                             NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
                             print(NR)
                             RN = NR
-                            print(RN)
                         except AttributeError:
                             print("カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。")
                             RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
                             pass
+                    elif "http://dcd.sc/n3" in path or "http://dcd.sc/n1" in path:
+                        NR = "学生証です。"
+                        print(NR)
+                        RN = NR
+                    elif "http://dcd.sc/n0" in path:
+                        NR = "アイドルカードです。"
+                        print(NR)
+                        RN = NR
                         
                     break
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -207,6 +214,43 @@ QRを読み取る場合はQRと入れてください
                 sys.exit()
 
             path = read[0][0].decode('utf-8', 'ignore')
+            
+            if "http://dcd.sc/n2" in path:
+                target_url = path
+                r = requests.get(target_url) 
+                soup = BeautifulSoup(r.text, 'lxml')
+                try:
+                    NR = soup.find("dd", class_="cardNum").get_text()
+                    RR = soup.find("dd", class_="cardName").get_text()
+                    RN = NR + "_" + RR
+                    print(RN)
+                except AttributeError:
+                    print("カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。")
+                    RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+                    pass
+            elif "http://dcd.sc/j2" in path:
+                target_url = path
+                r = requests.get(target_url) 
+                soup = BeautifulSoup(r.text, 'lxml')
+                try:
+                    NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
+                    print(NR)
+                    RN = NR
+                    print(RN)
+                except AttributeError:
+                    print("カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。")
+                    RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+                    pass
+                else:
+                    pass
+            elif "http://dcd.sc/n3" in path or "http://dcd.sc/n1" in path:
+                NR = "学生証です。"
+                print(NR)
+                RN = NR
+            elif "http://dcd.sc/n0" in path:
+                NR = "アイドルカードです。"
+                print(NR)
+                RN = NR
 
         path = get_shortenURL(path)
 
