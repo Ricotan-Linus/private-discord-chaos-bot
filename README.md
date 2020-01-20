@@ -1,8 +1,10 @@
 # Aikatsu-QR-Slack-Post-Program
 アイカツのQRコードを読み取りSlackに送信します。
 
-## 動作の手順
-適当にカードをスキャンした画像を用意するかその場に用意する
+## 動作させる前に
+python3.8のみ動作確認をしています。python3.7で動くかもしれませんが。
+[ここ](https://www.python.org/downloads/release/python-381/)からダウンロードしてください。
+
 
 
 
