@@ -2,11 +2,17 @@
 アイカツのQRコードを読み取りSlackに送信します。
 
 ## 動作させる前に
-python3.8のみ動作確認をしています。python3.7で動くかもしれませんが。
+1.python3.8のみ動作確認をしています。python3.7で動くかもしれませんが。
 [ここ](https://www.python.org/downloads/release/python-381/)からダウンロードしてください。
 
+2.Windowsでの動作が不安定な可能性があります。なのでWindowsでの動作はunstableとして対応します。
 
+3.Linuxでの動作を見ていません。機会があれば見ます。
 
+## 動作に必要なもの
+BitryのAPI。[これ](https://qiita.com/maruyam-a/items/96c8ad733c770a44117e)を参考に取得する事。取得したAPIをkey.py.txtに書き込む。
+
+(masterブランチからcloneする時)ワークスペースでも作って[ここ](https://qiita.com/yuukiw00w/items/94e4495fc593cfbda45c)を参考にAppを作りスコープを設定する事。
 
 ## 対応確認カード
 オンパレード2弾通常排出カード
