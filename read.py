@@ -13,26 +13,8 @@ from pyzbar.pyzbar import decode
 import requests
 import slack
 from bs4 import BeautifulSoup
-import unicodedata
 
 SLACK_BOT_TOKEN = key.SLACK_BOT_TOKEN
-
-
-def SearchImage():
-    homeDir = expanduser('~')
-    imageDir = homeDir + '\\Pictures\\Camera Roll'
-    imageList = os.listdir(imageDir)
-    return (imageDir + '\\' + imageList[-1])
-
-
-def QRreade(image):
-    readResult = decode(Image.open(image))
-    if (readResult != []):
-        return readResult
-    else:
-        print('QRコードを検出できませんでした')
-        exit()
-
 
 def get_shortenURL(longUrl):
     url = 'https://api-ssl.bitly.com/v3/shorten'
@@ -43,13 +25,6 @@ def get_shortenURL(longUrl):
     }
     r = requests.get(url, params=query).json()
     return r
-
-
-def SPOST(RN):
-    slackch = key.slackch
-    client = slack.WebClient(token=SLACK_BOT_TOKEN)
-    response = client.chat_postMessage(channel=slackch, text=RN)
-
 
 def post(card):
     slackch = key.slackch
@@ -178,7 +153,7 @@ QRを読み取る場合はQRと入れてください
 
         cv2.destroyAllWindows()
 
-        if "http://aikatsu.com/qr/id=" in path or "AK" in path:
+        if "http://aikatsu.com/qr/id=" in path or "AK" in path and "http://dcd.sc/" not in path:
             print(
                 """旧カツのカードは対応していません。
 該当の画像を入れてください
@@ -267,8 +242,6 @@ QRを読み取る場合はQRと入れてください
         
         card = RN + "\n" + card
         
-        #SPOST(RN)
-    
         post(card)
 
         card = image = path = RN = RR = NR = None
