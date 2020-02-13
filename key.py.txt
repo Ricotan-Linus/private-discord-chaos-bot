@@ -1,2 +1,4 @@
 access_token = 'XXXXXXX'
 #bitlyのトークン
+TOKEN = 'XXXXXX'
+#discord側
