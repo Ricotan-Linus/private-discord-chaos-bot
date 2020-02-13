@@ -5,6 +5,7 @@ from pyzbar import pyzbar
 from pyzbar.pyzbar import decode
 import requests
 import key
+from bs4 import BeautifulSoup
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -32,18 +33,56 @@ def download_img(url, file_name):
 @client.event
 async def on_message(message):
     if str(client.user.id) in message.content:
-        print("True")
-        if message.content.startswith('/pic'):
-            await client.send_message(channel, '画像確認')
-            filename = str(message.attachments[0]['filename'])
-            download_img(message.attachments[0]['url'], "image.png")
-            await client.send_message(channel, '画像確認')
-            path = "image.png"
-            path = decode(Image.open(path))
-            path = path[0][0].decode('utf-8', 'ignore')
-            print(path)
-            path = get_shortenURL(path)
-            client.send_message(channel, path)
-            path = None
+        RN = None
+        channel = client.get_channel(message.channel)
+        await message.channel.send('画像確認')
+        print(type(message))
+        print(type(message.attachments))
+        print(message.attachments[0])
+        filename = message.attachments[0].filename
+        download_img(message.attachments[0].url, filename)
+        await message.channel.send('画像確認')
+        path = filename
+        path = decode(Image.open(path))
+        path = path[0][0].decode('utf-8', 'ignore')
+        if "http://dcd.sc/n2" in path:
+            target_url = path
+            r = requests.get(target_url) 
+            soup = BeautifulSoup(r.text, 'lxml')
+            try:
+                NR = soup.find("dd", class_="cardNum").get_text()
+                RR = soup.find("dd", class_="cardName").get_text()
+                RN = NR + "_" + RR
+                print(RN)
+            except AttributeError:
+                RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+        elif "http://dcd.sc/j2" in path:
+            target_url = path
+            r = requests.get(target_url) 
+            soup = BeautifulSoup(r.text, 'lxml')
+            try:
+                NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
+                print(NR)
+                RN = NR
+                print(RN)
+            except AttributeError:
+                RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+        elif "http://dcd.sc/n3" in path or "http://dcd.sc/n1" in path:
+            NR = "学生証です。"
+            print(NR)
+            RN = NR
+        elif "http://dcd.sc/n0" in path:
+            NR = "アイドルカードまたはフルコーデカードです。"
+            print(NR)
+            RN = NR
+        path = get_shortenURL(path)
+        try:
+            card = path['data']['url']
+        except TypeError:
+            RN = "旧カツカードまたは読み込めない形式のカードです。"
+            card = "対応カードはgithubのreadmeをご覧ください。"
+        await message.channel.send(RN)
+        await message.channel.send(card)
+        path = card = None
 
 client.run(TOKEN)
