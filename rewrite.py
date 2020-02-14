@@ -35,16 +35,16 @@ async def on_message(message):
     if str(client.user.id) in message.content:
         RN = None
         channel = client.get_channel(message.channel)
-        await message.channel.send('画像確認')
+        await message.channel.send('受け付けました')
         print(type(message))
         print(type(message.attachments))
         print(message.attachments[0])
         filename = message.attachments[0].filename
         download_img(message.attachments[0].url, filename)
-        await message.channel.send('画像確認')
         path = filename
         path = decode(Image.open(path))
         path = path[0][0].decode('utf-8', 'ignore')
+        print(path)
         if "http://dcd.sc/n2" in path:
             target_url = path
             r = requests.get(target_url) 

@@ -1,5 +1,5 @@
 # Aikatsu-QR-Slack-Post-Program
-アイカツのQRコードを読み取りSlackに送信します。
+アイカツのQRコードを読み取りDiscordに送信します。
 
 ## 動作させる前に
 1.python3.8のみ動作確認をしています。python3.7で動くかもしれませんが。
