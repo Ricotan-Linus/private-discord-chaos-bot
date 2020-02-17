@@ -6,6 +6,7 @@ from pyzbar.pyzbar import decode
 import requests
 import key
 from bs4 import BeautifulSoup
+import os
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -87,6 +88,8 @@ async def on_message(message):
             card = "対応カードはgithubのreadmeをご覧ください。"
         await message.channel.send(RN)
         await message.channel.send(card)
+        os.remove(filename)
         path = card = None
+
 
 client.run(TOKEN)
