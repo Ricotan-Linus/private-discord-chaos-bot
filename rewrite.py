@@ -32,7 +32,7 @@ def download_img(url, file_name):
 
 @client.event
 async def on_message(message):
-    if str(client.user.id) in message.content:
+    if not len(message.attachments)==0:
         RN = None
         channel = client.get_channel(message.channel)
         await message.channel.send('受け付けました')
@@ -43,7 +43,11 @@ async def on_message(message):
         download_img(message.attachments[0].url, filename)
         path = filename
         path = decode(Image.open(path))
-        path = path[0][0].decode('utf-8', 'ignore')
+        try:
+            path = path[0][0].decode('utf-8', 'ignore')
+        except IndexError:
+            await message.channel.send("対象外の画像です")
+            return
         print(path)
         if "http://dcd.sc/n2" in path:
             target_url = path
