@@ -7,6 +7,7 @@ import requests
 import key
 from bs4 import BeautifulSoup
 import os
+import pprint
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -16,14 +17,26 @@ async def on_ready():
     print('ログインしました')
 
 def get_shortenURL(longUrl):
-    url = 'https://api-ssl.bitly.com/v3/shorten'
+    longUrl = longUrl
     access_token = key.access_token
+
+    url = "https://api-ssl.bitly.com/v4/shorten"
+    headers = {"Authorization":'Bearer {}'.format(access_token),
+            "Content-Type": "application/json",
+            "Host": "api-ssl.bitly.com",
+            "Accept":"application/json"
+            }
+
     query = {
-        'access_token': access_token,
-        'longurl': longUrl,
-    }
-    r = requests.get(url, params=query).json()
-    return r
+        "long_url":longUrl,
+        "group_guid": 'Bjbb5t5fKqI',
+        "domain": "bit.ly"
+        }
+    r = requests.post(url, json= query, headers= headers)
+    print(r.status_code)
+    r.json()
+    r = r.json()['link']
+    return(r)
 
 def download_img(url, file_name):
     r = requests.get(url, stream=True)
@@ -81,15 +94,12 @@ async def on_message(message):
             print(NR)
             RN = NR
         path = get_shortenURL(path)
-        try:
-            card = path['data']['url']
-        except TypeError:
-            RN = "旧カツカードまたは読み込めない形式のカードです。"
-            card = "対応カードはgithubのreadmeをご覧ください。"
+        print(path)
+        print(r)
         await message.channel.send(RN)
-        await message.channel.send(card)
+        await message.channel.send(path)
         os.remove(filename)
-        path = card = None
+        path = card = r = None
 
 
 client.run(TOKEN)
