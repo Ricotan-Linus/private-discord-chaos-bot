@@ -1,13 +1,16 @@
 import discord
 import json
 from PIL import Image
-from pyzbar import pyzbar
-from pyzbar.pyzbar import decode
 import requests
 import key
-from bs4 import BeautifulSoup
 import os
 import pprint
+import zbarlight
+import argparse
+import subprocess
+import command
+from bs4 import BeautifulSoup
+import re
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -15,6 +18,14 @@ client = discord.Client()
 @client.event
 async def on_ready():
     print('ログインしました')
+
+def rep(c,s):
+    d = str(c.pop(0)) + str(s.pop(0))
+    d = re.sub(r"[./<=>\"]", "", d)
+    d = re.sub(r'<a(.+)</a>', "", d)
+    d = re.sub(r" ", "", d)
+    d = d.replace('p', '').replace('classbold', '').replace('classtiny', '/').replace('Noissues', 'No issues').strip().strip()
+    return d    
 
 def get_shortenURL(longUrl):
     longUrl = longUrl
@@ -46,22 +57,64 @@ def download_img(url, file_name):
 
 @client.event
 async def on_message(message):
+    if message.content.startswith("廃人"):
+        channel = client.get_channel(message.channel)
+        res = requests.get('https://status.slack.com/')
+        soup = BeautifulSoup(res.text, 'html.parser')
+        c = soup.find_all('p',class_="bold")
+        s = soup.find_all('p',class_="tiny")
+        c = c[1:4]
+        s = s[5:8]
+        for i in range(3):
+            d = rep(c,s)
+            await message.channel.send(d)
+    if message.content.startswith("ipcall"):
+        channel = client.get_channel(message.channel)
+        res = requests.get("http://inet-ip.info/ip")
+        await message.channel.send(res.text)
+    if message.content.startswith("wakeup"):
+        channel = client.get_channel(message.channel)
+        id = "<@714406627603644489>"
+        nu = int(150)
+        for i in range(nu):
+            await message.channel.send(id + "さん起きて！！！")
+    if message.content.startswith("プロセスを殺す"):
+       channel = client.get_channel(message.channel)
+       id = "<@366844805470486528>"
+       await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
+       os.kill(os.getpid(), 11)
+    if message.content.startswith("フォースアゲイン"):
+       channel = client.get_channel(message.channel)
+       id = "<@366844805470486528>"
+       await message.channel.send(id+"_"+"再起動します")
+       os.system("reboot")
+    if message.content.startswith("プロセス把握"):
+       channel = client.get_channel(message.channel)
+       global response
+       response = str(subprocess.check_output(['ps',"aux"]))
+       print(response)
+       response.replace(' ', '\n')
+       response = response[:2000]
+       await message.channel.send(response)
     if not len(message.attachments)==0:
         RN = None
         channel = client.get_channel(message.channel)
         await message.channel.send('受け付けました')
-        print(type(message))
-        print(type(message.attachments))
-        print(message.attachments[0])
         filename = message.attachments[0].filename
         download_img(message.attachments[0].url, filename)
-        path = filename
-        path = decode(Image.open(path))
-        try:
-            path = path[0][0].decode('utf-8', 'ignore')
-        except IndexError:
+        file_path = filename
+        with open(file_path, 'rb') as image_file:
+            image = Image.open(image_file)
+            image.load()
+        path = zbarlight.scan_codes(['qrcode'], image)
+        print(path)
+        print(type(path))
+        if path is None:
             await message.channel.send("対象外の画像です")
+            os.remove(filename)
             return
+        path = path.pop(0)
+        path = path.decode('utf-8')
         print(path)
         if "http://dcd.sc/n2" in path:
             target_url = path
@@ -95,7 +148,6 @@ async def on_message(message):
             RN = NR
         path = get_shortenURL(path)
         print(path)
-        print(r)
         await message.channel.send(RN)
         await message.channel.send(path)
         os.remove(filename)
