@@ -72,12 +72,6 @@ async def on_message(message):
         channel = client.get_channel(message.channel)
         res = requests.get("http://inet-ip.info/ip")
         await message.channel.send(res.text)
-    if message.content.startswith("wakeup"):
-        channel = client.get_channel(message.channel)
-        id = "<@714406627603644489>"
-        nu = int(150)
-        for i in range(nu):
-            await message.channel.send(id + "さん起きて！！！")
     if message.content.startswith("プロセスを殺す"):
        channel = client.get_channel(message.channel)
        id = "<@366844805470486528>"
