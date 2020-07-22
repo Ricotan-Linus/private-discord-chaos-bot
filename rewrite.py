@@ -73,23 +73,33 @@ async def on_message(message):
         res = requests.get("http://inet-ip.info/ip")
         await message.channel.send(res.text)
     if message.content.startswith("プロセスを殺す"):
-       channel = client.get_channel(message.channel)
-       id = "<@366844805470486528>"
-       await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
-       os.kill(os.getpid(), 11)
+        channel = client.get_channel(message.channel)
+        id = "<@366844805470486528>"
+        await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
+        os.kill(os.getpid(), 11)
     if message.content.startswith("フォースアゲイン"):
-       channel = client.get_channel(message.channel)
-       id = "<@366844805470486528>"
-       await message.channel.send(id+"_"+"再起動します")
-       os.system("reboot")
+        channel = client.get_channel(message.channel)
+        id = "<@366844805470486528>"
+        await message.channel.send(id+"_"+"再起動します")
+        os.system("reboot")
+    if message.content.startswith("今日の大空お天気"):
+        channel = client.get_channel(message.channel)
+        soup = requests.get("https://www.aikatsu.com/onparade/")
+        soup = BeautifulSoup(soup.text, 'html.parser')
+        soup = soup.find_all("p")
+        soup = str(soup.pop(0))
+        soup = re.sub(r'<br(.+)</p>', "", soup)
+        soup = soup.replace('<p>', '')
+        await message.channel.send(soup)
+        
     if message.content.startswith("プロセス把握"):
-       channel = client.get_channel(message.channel)
-       global response
-       response = str(subprocess.check_output(['ps',"aux"]))
-       print(response)
-       response.replace(' ', '\n')
-       response = response[:2000]
-       await message.channel.send(response)
+        channel = client.get_channel(message.channel)
+        global response
+        response = str(subprocess.check_output(['ps',"aux"]))
+        print(response)
+        response.replace(' ', '\n')
+        response = response[:2000]
+        await message.channel.send(response)
     if not len(message.attachments)==0:
         RN = None
         channel = client.get_channel(message.channel)
