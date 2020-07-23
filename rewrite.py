@@ -86,10 +86,19 @@ async def on_message(message):
         channel = client.get_channel(message.channel)
         soup = requests.get("https://www.aikatsu.com/onparade/")
         soup = BeautifulSoup(soup.text, 'html.parser')
-        soup = soup.find_all("p")
-        soup = str(soup.pop(0))
-        soup = re.sub(r'<br(.+)</p>', "", soup)
-        soup = soup.replace('<p>', '')
+        check = soup.find_all("div",class_='txt_detail-date')
+        if check == []:
+            soup = soup.find_all('dd',class_="txt_detail")
+            soup = str(soup.pop(0))
+            soup = soup.replace('<dd class="txt_detail">','').replace('</dd>','')
+            print(soup)
+            print(type(soup))
+        else:
+            check = soup.find_all("div",class_='txt_detail-date')
+            soup = str(soup.pop(0))
+            soup = re.sub(r'<br(.+)</p>', "", soup)
+            soup = soup.replace('<p>', '')
+            soup = soup.replace('</p>', '')
         await message.channel.send(soup)
         
     if message.content.startswith("プロセス把握"):
