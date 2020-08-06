@@ -4,7 +4,6 @@ from PIL import Image
 import requests
 import key
 import os
-import pprint
 import zbarlight
 import argparse
 import subprocess
@@ -46,7 +45,10 @@ def get_shortenURL(longUrl):
     r = requests.post(url, json= query, headers= headers)
     print(r.status_code)
     r.json()
-    r = r.json()['link']
+    try:
+        r = r.json()['link']
+    except KeyError:
+        r = "error"
     return(r)
 
 def download_img(url, file_name):
@@ -57,6 +59,13 @@ def download_img(url, file_name):
 
 @client.event
 async def on_message(message):
+    if message.content.startswith("wakeup"):
+        channel = client.get_channel(message.channel)
+        id = "<@714406627603644489>"
+        rico = "<@366844805470486528>"
+        nu = int(150)
+        for i in range(nu):
+            await message.channel.send(id +" "+ rico + "起きて！！！")
     if message.content.startswith("廃人"):
         channel = client.get_channel(message.channel)
         res = requests.get('https://status.slack.com/')
@@ -100,14 +109,64 @@ async def on_message(message):
             soup = soup.replace('<p>', '')
             soup = soup.replace('</p>', '')
         await message.channel.send(soup)
-        
-    if message.content.startswith("プロセス把握"):
+    if message.content.startswith("金沢地方の遅れ"):
         channel = client.get_channel(message.channel)
+        soup = requests.get("https://trafficinfo.westjr.co.jp/hokuriku.html")
+        soup = BeautifulSoup(soup.text, 'html.parser')
+        check = soup.find_all("p",class_='gaiyo')
+        if check == []:
+            soup = soup.find_all('strong')
+            soup = str(soup.pop(0))
+            soup = soup.replace('<strong>', '')
+            soup = soup.replace('</strong>', '')
+            await message.channel.send(soup)
+        else:
+            ls = soup.find_all('p',class_='gaiyo')
+            while True:
+                soup = ls.pop(0)
+                soup = str(soup)
+                soup = soup.replace('<p class="gaiyo">', '')
+                soup = soup.replace('<br/>','')
+                soup = soup.replace('</p>', '')
+                await message.channel.send(soup)
+                if ls == []:
+                    break
+    if message.content.startswith("近畿地方の遅れ"):
+        channel = client.get_channel(message.channel)
+        soup = requests.get("https://trafficinfo.westjr.co.jp/kinki.html")
+        soup = BeautifulSoup(soup.text, 'html.parser')
+        check = soup.find_all("p",class_='gaiyo')
+        if check == []:
+            soup = soup.find_all('strong')
+            soup = str(soup.pop(0))
+            soup = soup.replace('<strong>', '')
+            soup = soup.replace('</strong>', '')
+            await message.channel.send(soup)
+        else:
+            ls = soup.find_all('p',class_='gaiyo')
+            while True:
+                soup = ls.pop(0)
+                soup = str(soup)
+                soup = soup.replace('<p class="gaiyo">', '')
+                soup = soup.replace('<br/>','')
+                soup = soup.replace('</p>', '')
+                await message.channel.send(soup)
+                if ls == []:
+                    break
+    if message.content.startswith("プロセス把握"):
+        channel =client.get_channel(message.channel)
         global response
         response = str(subprocess.check_output(['ps',"aux"]))
         print(response)
         response.replace(' ', '\n')
         response = response[:2000]
+        await message.channel.send(response)
+    if message.content.startswith("キモオタ"):
+        channel =client.get_channel(message.channel)
+        ID = "<@714406627603644489>"
+        response = subprocess.check_output(['ojichat',"なぼ"]).decode(encoding='utf-8').rstrip()
+        response = ID + response
+        print(response)
         await message.channel.send(response)
     if not len(message.attachments)==0:
         RN = None
@@ -118,12 +177,14 @@ async def on_message(message):
         file_path = filename
         with open(file_path, 'rb') as image_file:
             image = Image.open(image_file)
+            print("open")
             image.load()
+            print("load")
         path = zbarlight.scan_codes(['qrcode'], image)
         print(path)
         print(type(path))
         if path is None:
-            await message.channel.send("対象外の画像です")
+            await message.channel.send("Error! QRコードが検出されませんでした。")
             os.remove(filename)
             return
         path = path.pop(0)
@@ -150,7 +211,7 @@ async def on_message(message):
                 RN = NR
                 print(RN)
             except AttributeError:
-                RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+                    RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
         elif "http://dcd.sc/n3" in path or "http://dcd.sc/n1" in path:
             NR = "学生証です。"
             print(NR)
@@ -161,10 +222,15 @@ async def on_message(message):
             RN = NR
         path = get_shortenURL(path)
         print(path)
-        await message.channel.send(RN)
-        await message.channel.send(path)
-        os.remove(filename)
-        path = card = r = None
-
+        if path == "error":
+            await message.channel.send("Error! おそらくKyashなどのアプリ内でのみ使えるQRを送信しようとしていませんか？")
+            os.remove(filename)
+            path = card = r = None
+            return
+        else:
+            await message.channel.send(RN)
+            await message.channel.send(path)
+            os.remove(filename)
+            path = card = r = None
 
 client.run(TOKEN)
