@@ -10,6 +10,7 @@ import subprocess
 import command
 from bs4 import BeautifulSoup
 import re
+from pyzbar.pyzbar import decode
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -85,11 +86,14 @@ async def on_message(message):
         channel = client.get_channel(message.channel)
         id = "<@366844805470486528>"
         await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
+        await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
         os.kill(os.getpid(), 11)
     if message.content.startswith("フォースアゲイン"):
         channel = client.get_channel(message.channel)
-        id = "<@366844805470486528>"
-        await message.channel.send(id+"_"+"再起動します")
+        adminID = "<@366844805470486528>"
+        SecondAdminID = "<@529644095027806208>"
+        await message.channel.send(adminID+"\n"+SecondAdminID+"\n"+"再起動します")
+        await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
         os.system("reboot")
     if message.content.startswith("今日の大空お天気"):
         channel = client.get_channel(message.channel)
@@ -175,12 +179,14 @@ async def on_message(message):
         filename = message.attachments[0].filename
         download_img(message.attachments[0].url, filename)
         file_path = filename
-        with open(file_path, 'rb') as image_file:
-            image = Image.open(image_file)
-            print("open")
-            image.load()
-            print("load")
-        path = zbarlight.scan_codes(['qrcode'], image)
+        #try:
+        read = decode(Image.open(file_path))
+        #except OSError:
+            #await message.channel.send('LINEのQRを送ろうとしていませんか？')
+            #os.remove(filename)
+        #finally:
+            #pass
+        path = read[0][0].decode('utf-8', 'ignore')
         print(path)
         print(type(path))
         if path is None:
