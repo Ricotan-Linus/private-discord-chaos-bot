@@ -11,20 +11,32 @@ import command
 from bs4 import BeautifulSoup
 import re
 from pyzbar.pyzbar import decode
+import socket
 
 TOKEN = key.TOKEN
 client = discord.Client()
 
+#reboot CONFIG
+FA = "再起動不可能"
+
+def conf_on():
+    global FA
+    FA = "再起動可能"
+    
+def conf_off():
+    global FA
+    FA = "再起動不可能"
+    
 @client.event
 async def on_ready():
     print('ログインしました')
 
 def rep(c,s):
-    d = str(c.pop(0)) + str(s.pop(0))
+    d = str(c.pop(0))+"\n"+str(s.pop(0))
     d = re.sub(r"[./<=>\"]", "", d)
     d = re.sub(r'<a(.+)</a>', "", d)
     d = re.sub(r" ", "", d)
-    d = d.replace('p', '').replace('classbold', '').replace('classtiny', '/').replace('Noissues', 'No issues').strip().strip()
+    d = d.replace('p', '').replace('classbold', '').replace('classtiny', '          ').replace('Noissues', 'No issues').strip().strip()
     return d    
 
 def get_shortenURL(longUrl):
@@ -60,22 +72,26 @@ def download_img(url, file_name):
 
 @client.event
 async def on_message(message):
-    if message.content.startswith("wakeup"):
+    if message.content.startswith('whoami'):
         channel = client.get_channel(message.channel)
-        id = "<@714406627603644489>"
-        rico = "<@366844805470486528>"
-        nu = int(150)
-        for i in range(nu):
-            await message.channel.send(id +" "+ rico + "起きて！！！")
+        llip = ([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
+        await message.channel.send("私は"+socket.gethostname()+"だよっ☆"+"\n"+"ローカルipは"+llip+"だよっ☆")
     if message.content.startswith("廃人"):
         channel = client.get_channel(message.channel)
         res = requests.get('https://status.slack.com/')
-        soup = BeautifulSoup(res.text, 'html.parser')
+        soup = BeautifulSoup(res.text, 'html5lib')
         c = soup.find_all('p',class_="bold")
         s = soup.find_all('p',class_="tiny")
         c = c[1:4]
         s = s[5:8]
-        for i in range(3):
+        d = str(c.pop(0))+"\n"+str(s.pop(0))
+        d=re.sub(r'<a(.+)</a>', "", d)
+        d=re.sub(r'</p>', "", d)
+        d=re.sub(r'<p class=\"tiny\">', "", d)
+        d=d.replace("  ","                        ")
+        d=re.sub(r'<p class=\"bold\">', "", d)
+        await message.channel.send(d)
+        for i in range(2):
             d = rep(c,s)
             await message.channel.send(d)
     if message.content.startswith("ipcall"):
@@ -87,18 +103,35 @@ async def on_message(message):
         id = "<@366844805470486528>"
         await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
         await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
+        await client.logout()
         os.kill(os.getpid(), 11)
+    if message.content.startswith("!whichfa"):
+        await message.channel.send(FA)
+    if message.content.startswith("!afa"):
+        if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
+            conf_on()
+            await message.channel.send("再起動のブロックを解除しました")
+    if message.content.startswith("!dfa"):
+        if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
+            conf_off()
+            await message.channel.send("再起動をブロックしました")
     if message.content.startswith("フォースアゲイン"):
         channel = client.get_channel(message.channel)
-        adminID = "<@366844805470486528>"
-        SecondAdminID = "<@529644095027806208>"
-        await message.channel.send(adminID+"\n"+SecondAdminID+"\n"+"再起動します")
-        await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
-        os.system("reboot")
+        if "再起動不可能" in FA:
+            #modID = "<@&745349159175061574>"
+            #await message.channel.send("作業中につき再起動をブロックしています。お急ぎの場合は"+modID+"へメンションするかけいたんへ再起動を依頼してください。")
+            await message.channel.send("作業中につき再起動をブロックしています。お急ぎの場合はモデレーターへメンションするかけいたんへ再起動を依頼してください。") 
+        else:    
+            adminID = "<@366844805470486528>"
+            SecondAdminID = "<@529644095027806208>"
+            await message.channel.send(adminID+"\n"+SecondAdminID+"\n"+"再起動します")
+            await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
+            await client.logout()
+            os.system("reboot")
     if message.content.startswith("今日の大空お天気"):
         channel = client.get_channel(message.channel)
         soup = requests.get("https://www.aikatsu.com/onparade/")
-        soup = BeautifulSoup(soup.text, 'html.parser')
+        soup = BeautifulSoup(soup.text, 'html5lib')
         check = soup.find_all("div",class_='txt_detail-date')
         if check == []:
             soup = soup.find_all('dd',class_="txt_detail")
@@ -116,7 +149,7 @@ async def on_message(message):
     if message.content.startswith("金沢地方の遅れ"):
         channel = client.get_channel(message.channel)
         soup = requests.get("https://trafficinfo.westjr.co.jp/hokuriku.html")
-        soup = BeautifulSoup(soup.text, 'html.parser')
+        soup = BeautifulSoup(soup.text, 'html5lib')
         check = soup.find_all("p",class_='gaiyo')
         if check == []:
             soup = soup.find_all('strong')
@@ -138,7 +171,7 @@ async def on_message(message):
     if message.content.startswith("近畿地方の遅れ"):
         channel = client.get_channel(message.channel)
         soup = requests.get("https://trafficinfo.westjr.co.jp/kinki.html")
-        soup = BeautifulSoup(soup.text, 'html.parser')
+        soup = BeautifulSoup(soup.text, 'html5lib')
         check = soup.find_all("p",class_='gaiyo')
         if check == []:
             soup = soup.find_all('strong')
@@ -186,20 +219,25 @@ async def on_message(message):
             #os.remove(filename)
         #finally:
             #pass
-        path = read[0][0].decode('utf-8', 'ignore')
+        try:
+            path = read[0][0].decode('utf-8', 'ignore')
+        except IndexError:
+            await message.channel.send("Error! QRコードが検出されませんでした。")
+            os.remove(filename)
+            return
         print(path)
         print(type(path))
         if path is None:
             await message.channel.send("Error! QRコードが検出されませんでした。")
             os.remove(filename)
             return
-        path = path.pop(0)
-        path = path.decode('utf-8')
+        #path = path.pop(0)
+        #path = path.decode('utf-8')
         print(path)
         if "http://dcd.sc/n2" in path:
             target_url = path
             r = requests.get(target_url) 
-            soup = BeautifulSoup(r.text, 'lxml')
+            soup = BeautifulSoup(r.text, 'html5lib')
             try:
                 NR = soup.find("dd", class_="cardNum").get_text()
                 RR = soup.find("dd", class_="cardName").get_text()
@@ -210,7 +248,7 @@ async def on_message(message):
         elif "http://dcd.sc/j2" in path:
             target_url = path
             r = requests.get(target_url) 
-            soup = BeautifulSoup(r.text, 'lxml')
+            soup = BeautifulSoup(r.text, 'html5lib')
             try:
                 NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
                 print(NR)
