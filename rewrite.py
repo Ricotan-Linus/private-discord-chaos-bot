@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 import re
 from pyzbar.pyzbar import decode
 import socket
+import random
 
 TOKEN = key.TOKEN
 client = discord.Client()
@@ -36,7 +37,7 @@ def rep(c,s):
     d = re.sub(r"[./<=>\"]", "", d)
     d = re.sub(r'<a(.+)</a>', "", d)
     d = re.sub(r" ", "", d)
-    d = d.replace('p', '').replace('classbold', '').replace('classtiny', '          ').replace('Noissues', 'No issues').strip().strip()
+    d = d.replace('p', '').replace('classbold', '').replace('classtiny', '').replace('Noissues', 'No issues').strip().strip()
     return d    
 
 def get_shortenURL(longUrl):
@@ -94,6 +95,13 @@ async def on_message(message):
         for i in range(2):
             d = rep(c,s)
             await message.channel.send(d)
+    if message.content.startswith('オールデリート'):
+            if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
+                id = "<@366844805470486528>"
+                await message.channel.send(id+"宛。"+"緊急終了実行。")
+                await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
+                await client.logout()
+                os.kill(os.getpid(), 11)
     if message.content.startswith("ipcall"):
         channel = client.get_channel(message.channel)
         res = requests.get("http://inet-ip.info/ip")
@@ -118,9 +126,7 @@ async def on_message(message):
     if message.content.startswith("フォースアゲイン"):
         channel = client.get_channel(message.channel)
         if "再起動不可能" in FA:
-            #modID = "<@&745349159175061574>"
-            #await message.channel.send("作業中につき再起動をブロックしています。お急ぎの場合は"+modID+"へメンションするかけいたんへ再起動を依頼してください。")
-            await message.channel.send("作業中につき再起動をブロックしています。お急ぎの場合はモデレーターへメンションするかけいたんへ再起動を依頼してください。") 
+            await message.channel.send("作業中につき再起動をブロックしています。botが暴走している場合はモデレーターへメンションしてください。") 
         else:    
             adminID = "<@366844805470486528>"
             SecondAdminID = "<@529644095027806208>"
@@ -143,8 +149,7 @@ async def on_message(message):
             check = soup.find_all("div",class_='txt_detail-date')
             soup = str(soup.pop(0))
             soup = re.sub(r'<br(.+)</p>', "", soup)
-            soup = soup.replace('<p>', '')
-            soup = soup.replace('</p>', '')
+            soup = soup.replace('<p>', '').replace('</p>', '')
         await message.channel.send(soup)
     if message.content.startswith("金沢地方の遅れ"):
         channel = client.get_channel(message.channel)
@@ -154,17 +159,14 @@ async def on_message(message):
         if check == []:
             soup = soup.find_all('strong')
             soup = str(soup.pop(0))
-            soup = soup.replace('<strong>', '')
-            soup = soup.replace('</strong>', '')
+            soup = soup.replace('<strong>', '').replace('</strong>', '')
             await message.channel.send(soup)
         else:
             ls = soup.find_all('p',class_='gaiyo')
             while True:
                 soup = ls.pop(0)
                 soup = str(soup)
-                soup = soup.replace('<p class="gaiyo">', '')
-                soup = soup.replace('<br/>','')
-                soup = soup.replace('</p>', '')
+                soup = soup.replace('<p class="gaiyo">', '').replace('<br/>','').replace('</p>', '')
                 await message.channel.send(soup)
                 if ls == []:
                     break
@@ -176,17 +178,14 @@ async def on_message(message):
         if check == []:
             soup = soup.find_all('strong')
             soup = str(soup.pop(0))
-            soup = soup.replace('<strong>', '')
-            soup = soup.replace('</strong>', '')
+            soup = soup.replace('<strong>', '').replace('</strong>', '')
             await message.channel.send(soup)
         else:
             ls = soup.find_all('p',class_='gaiyo')
             while True:
                 soup = ls.pop(0)
                 soup = str(soup)
-                soup = soup.replace('<p class="gaiyo">', '')
-                soup = soup.replace('<br/>','')
-                soup = soup.replace('</p>', '')
+                soup = soup.replace('<p class="gaiyo">', '').replace('<br/>','').replace('</p>', '')
                 await message.channel.send(soup)
                 if ls == []:
                     break
@@ -198,7 +197,12 @@ async def on_message(message):
         response.replace(' ', '\n')
         response = response[:2000]
         await message.channel.send(response)
-    if message.content.startswith("キモオタ"):
+    if message.content.startswith("neofetch"):
+        channel = client.get_channel(message.channel)
+        responce = str(subprocess.check_output(["neofetch"]))
+        responce = str(responce[:2000])
+        await message.channel.send(responce)
+    if message.content.startswith("naboon_chat"):
         channel =client.get_channel(message.channel)
         ID = "<@714406627603644489>"
         response = subprocess.check_output(['ojichat',"なぼ"]).decode(encoding='utf-8').rstrip()
@@ -206,19 +210,15 @@ async def on_message(message):
         print(response)
         await message.channel.send(response)
     if not len(message.attachments)==0:
+        if message.author.bot == True:
+            return
         RN = None
         channel = client.get_channel(message.channel)
         await message.channel.send('受け付けました')
         filename = message.attachments[0].filename
         download_img(message.attachments[0].url, filename)
         file_path = filename
-        #try:
         read = decode(Image.open(file_path))
-        #except OSError:
-            #await message.channel.send('LINEのQRを送ろうとしていませんか？')
-            #os.remove(filename)
-        #finally:
-            #pass
         try:
             path = read[0][0].decode('utf-8', 'ignore')
         except IndexError:
@@ -231,18 +231,14 @@ async def on_message(message):
             await message.channel.send("Error! QRコードが検出されませんでした。")
             os.remove(filename)
             return
-        #path = path.pop(0)
-        #path = path.decode('utf-8')
         print(path)
         if "http://dcd.sc/n2" in path:
             target_url = path
             r = requests.get(target_url) 
             soup = BeautifulSoup(r.text, 'html5lib')
             try:
-                NR = soup.find("dd", class_="cardNum").get_text()
-                RR = soup.find("dd", class_="cardName").get_text()
-                RN = NR + "_" + RR
-                print(RN)
+                NR = soup.find("dd", class_="cardNum").get_text()+" "+soup.find("dd", class_="cardName").get_text()
+                print(NR)
             except AttributeError:
                 RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
         elif "http://dcd.sc/j2" in path:
@@ -252,18 +248,14 @@ async def on_message(message):
             try:
                 NR = soup.find("div", class_="dress-detail-title clearfix").get_text()
                 print(NR)
-                RN = NR
-                print(RN)
             except AttributeError:
-                    RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
+                RN = "カード名取得失敗です。学生証を読み込んだ事またはリダイレクトの設定間違えだと思われます。"
         elif "http://dcd.sc/n3" in path or "http://dcd.sc/n1" in path:
             NR = "学生証です。"
             print(NR)
-            RN = NR
         elif "http://dcd.sc/n0" in path:
             NR = "アイドルカードまたはフルコーデカードです。"
             print(NR)
-            RN = NR
         path = get_shortenURL(path)
         print(path)
         if path == "error":
@@ -272,9 +264,25 @@ async def on_message(message):
             path = card = r = None
             return
         else:
-            await message.channel.send(RN)
+            await message.channel.send(NR)
             await message.channel.send(path)
             os.remove(filename)
             path = card = r = None
-
+    if message.content.startswith('pid'):
+        channel = client.get_channel(message.channel)
+        await message.channel.send(pid)
+    if message.content.startswith('!kill'):
+        if str(pid) in message.content:
+            if message.author.bot:
+                return
+            else:
+                id = "<@366844805470486528>"
+                await message.channel.send(id+"宛。"+"緊急終了実行。")
+                await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
+                await client.logout()
+                os.kill(os.getpid(), 11)
+        else:
+            return
+        
+pid = random.randrange(10001)
 client.run(TOKEN)
