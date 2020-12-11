@@ -98,8 +98,8 @@ async def on_message(message):
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-        else:
-            return
+                else:
+                    return
         elif "りこたんの右腕" in [users_role.name for users_role in message.author.roles]:
             channel = client.get_channel(message.channel)
             BanUser = message.mentions
@@ -118,8 +118,8 @@ async def on_message(message):
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-        else:
-            return
+                else:
+                    return
     if message.content.startswith('オールデリート'):
         if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
             id = "<@366844805470486528>"
