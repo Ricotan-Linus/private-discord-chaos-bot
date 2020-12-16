@@ -52,14 +52,14 @@ async def on_message(message):
                 print(KickUserDate)
                 user = discord.utils.get(message.guild.members, name=str(KickUserDate))
                 print(user)
-                await user.kick()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
-                await message.channel.send(KickUserDate+"を蹴り飛ばしました")
                 dm = await user.create_dm()
                 try:
                     await dm.send("あなたはKickされました。下の招待リンクからどうぞ。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
+                await user.kick()
+                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await message.channel.send(KickUserDate+"を蹴り飛ばしました")
         elif "りこたんの右腕" in [users_role.name for users_role in message.author.roles]:
             channel = client.get_channel(message.channel)
             KickUser = message.mentions
@@ -69,14 +69,14 @@ async def on_message(message):
                 KickUserDate = str(KickUser.pop(0))
                 print(KickUserDate)
                 user = discord.utils.get(message.guild.members, name=str(KickUserDate))
-                await user.kick()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
-                await message.channel.send(KickUserDate+"を蹴り飛ばしました")
                 dm = await user.create_dm()
                 try:
                     await dm.send("あなたはKickされました。下の招待リンクからどうぞ。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
+                await user.kick()
+                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await message.channel.send(KickUserDate+"を蹴り飛ばしました")
         else:
             return
     if message.content.startswith('!b'):
@@ -90,16 +90,14 @@ async def on_message(message):
                 BanUserDate = BanUserDate[:-5]
                 print(BanUserDate)
                 user = discord.utils.get(message.guild.members, name=BanUserDate)
-                await user.ban()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
-                await message.channel.send(BanUserDate+"を潰しました")
                 dm = await user.create_dm()
                 try:
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-                else:
-                    return
+                await user.ban()
+                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await message.channel.send(BanUserDate+"を潰しました")
         elif "りこたんの右腕" in [users_role.name for users_role in message.author.roles]:
             channel = client.get_channel(message.channel)
             BanUser = message.mentions
@@ -110,16 +108,14 @@ async def on_message(message):
                 BanUserDate = BanUserDate[:-5]
                 print(BanUserDate)
                 user = discord.utils.get(message.guild.members, name=BanUserDate)
-                await user.ban(reason="bot order")
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
-                await message.channel.send(BanUserDate+"を潰しました")
                 dm = await user.create_dm()
                 try:
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-                else:
-                    return
+                await user.ban(reason="bot order")
+                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await message.channel.send(BanUserDate+"を潰しました")
     if message.content.startswith('オールデリート'):
         if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
             id = "<@366844805470486528>"
