@@ -12,8 +12,8 @@ client = discord.Client()
 @client.event
 async def on_ready():
     print('WakeUp...')
-    subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kick.py"])
-    subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/rewrite.py"])
+    subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kick.py"])
+    subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/rewrite.py"])
     subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/search.py"])
     subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kazune.py"])
     
@@ -33,18 +33,18 @@ async def on_message(message):
         await message.channel.send("私は"+socket.gethostname()+"だよっ☆"+"\n"+"ローカルipは"+llip+"だよっ☆")
     if 'kickup' in message.content:
         channel = client.get_channel(message.channel)
-        subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kick.py"])
+        subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kick.py"])
         await message.channel.send("<@744874026966581380>"+"を叩き起こしました")
     if 'postup' in message.content:
         channel = client.get_channel(message.channel)
-        subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/rewrite.py"])
+        subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/rewrite.py"])
         await message.channel.send("<@673755083061723136>"+"を叩き起こしました")
     if 'kznboot' in message.content:
-        subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kazune.py"])
+        subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/kazune.py"])
         channel = client.get_channel(message.channel)
         await message.channel.send("<@780775643276771348>"+"を叩き起こしました")
     if 'searchawake' in message.content:
-        subprocess.Popen(["sudo","/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/search.py"])
+        subprocess.Popen(["/Library/Frameworks/Python.framework/Versions/3.7/bin/python3","/Users/jr485/Aikatsu-QR-Multi-Post-Program/search.py"])
         channel = client.get_channel(message.channel)
         await message.channel.send("<@779235375172026389>"+"を叩き起こしました")     
     if message.content.startswith('セグメントフォール'):

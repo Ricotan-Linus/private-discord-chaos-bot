@@ -10,6 +10,7 @@ intents.members = True
 
 TOKEN = key.CentralTOKEN
 client = discord.Client(intents=intents)
+pa = "Users/jr485/Aikatsu-QR-Multi-Post-Program/ppp.mov"
 
 def abc():
     global number
@@ -58,7 +59,8 @@ async def on_message(message):
                 except discord.errors.Forbidden:
                     pass
                 await user.kick()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                with open('ppp.mov', 'rb') as fp:
+                    await message.channel.send(file=discord.File(fp, 'new_filename.mov'))
                 await message.channel.send(KickUserDate+"を蹴り飛ばしました")
         elif "りこたんの右腕" in [users_role.name for users_role in message.author.roles]:
             channel = client.get_channel(message.channel)
@@ -75,7 +77,8 @@ async def on_message(message):
                 except discord.errors.Forbidden:
                     pass
                 await user.kick()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                with open('ppp.mov', 'rb') as fp:
+                    await message.channel.send(file=discord.File(fp, 'new_filename.mov'))
                 await message.channel.send(KickUserDate+"を蹴り飛ばしました")
         else:
             return
@@ -95,8 +98,9 @@ async def on_message(message):
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-                await user.ban()
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await user.ban(delete_message_days=0)
+                with open('ppp.mov', 'rb') as fp:
+                    await message.channel.send(file=discord.File(fp, 'new_filename.mov'))
                 await message.channel.send(BanUserDate+"を潰しました")
         elif "りこたんの右腕" in [users_role.name for users_role in message.author.roles]:
             channel = client.get_channel(message.channel)
@@ -113,8 +117,9 @@ async def on_message(message):
                     await dm.send("あなたはBANされました。概ね24時間以内に解除しますのでしばらくお待ちください。"+"\n"+"discord.gg/dkFmdVr")
                 except discord.errors.Forbidden:
                     pass
-                await user.ban(reason="bot order")
-                await message.channel.send("https://cdn.discordapp.com/attachments/734039650330607657/745431796098793519/c4333207179bc37d.mov")
+                await user.ban(reason="bot order",delete_message_days=0)
+                with open('ppp.mov', 'rb') as fp:
+                    await message.channel.send(file=discord.File(fp, 'new_filename.mov'))
                 await message.channel.send(BanUserDate+"を潰しました")
     if message.content.startswith('オールデリート'):
         if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:

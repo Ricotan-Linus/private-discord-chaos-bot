@@ -32,13 +32,11 @@ async def on_message(message):
         with open(a, 'rb') as fp:
             await channel.send(file=discord.File(fp, str(b)+'.jpg'))
             await message.channel.send("これは"+str(b)+"番目の画像です。")
-    if message.content.startswith('セグメントフォール'):
-        if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
-                id = "<@366844805470486528>"
-                await message.channel.send(id+"宛。"+"緊急終了実行。")
-                await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
-                await client.logout()
-                os.kill(os.getpid(), 11)
+    if message.content.startswith('おやすみかずね'):
+            await message.channel.send(message.author.mention+"、おやすみ〜")
+            await message.channel.send("実行:"+"<@"+str(message.author.mention)+">")
+            await client.logout()
+            os.kill(os.getpid(), 11)
     if message.content.startswith('オールデリート'):
             if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
                 id = "<@366844805470486528>"

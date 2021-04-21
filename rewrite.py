@@ -17,16 +17,31 @@ import random
 TOKEN = key.TOKEN
 client = discord.Client()
 
-#reboot CONFIG
-FA = "再起動不可能"
+#wakeup CONFIG
+wu = "on"
+
+#forceagain CONFIG
+fa = "off"
 
 def conf_on():
-    global FA
-    FA = "再起動可能"
-    
+    global wu
+    wu = "on"
+
 def conf_off():
-    global FA
-    FA = "再起動不可能"
+    global wu
+    wu = "off"
+    
+def fa_conf_on():
+    global fa
+    fa = "on"
+
+def fa_conf_off():
+    global fa
+    fa = "off"
+
+def abc():
+    global number
+    number = int(150)
     
 @client.event
 async def on_ready():
@@ -73,6 +88,34 @@ def download_img(url, file_name):
 
 @client.event
 async def on_message(message):
+    if message.content.startswith("!cwk"):
+        channel = client.get_channel(message.channel)
+        global number
+        try:
+            message.content = int(message.content[4:])
+        except ValueError:
+            await message.channel.send("数値ではないので回数変更できませんっ！")
+            return
+        if message.content >= int(1001):
+            await message.channel.send("1000以上の数値をやらせようとしないでくださいっ！")
+            return
+        else:
+            number = message.content
+            await message.channel.send("叩き起こすメンションの回数を"+str(number)+"に変更しましたっ！")
+            return
+    if message.content.startswith("!awk"):
+        if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
+            conf_on()
+            await message.channel.send("Wakeup可能ですっ！")
+    if message.content.startswith("!dwk"):
+        if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
+            conf_off()
+            await message.channel.send("Wakeup無効ですっ！")
+    if message.content.startswith("!whichwk"):
+        if "on" in wu:
+            await message.channel.send("Wakeup可能ですっ！")
+        else:
+            await message.channel.send("Wakeup無効ですっ！")
     if message.content.startswith('whoami'):
         channel = client.get_channel(message.channel)
         llip = ([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
@@ -109,24 +152,31 @@ async def on_message(message):
     if message.content.startswith("プロセスを殺す"):
         channel = client.get_channel(message.channel)
         id = "<@366844805470486528>"
-        await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します")
+        await message.channel.send(id+"_"+"要請によりプロセスを緊急終了します。")
         await message.channel.send("実行:"+"<@"+str(message.author.id)+">")
         await client.logout()
         os.kill(os.getpid(), 11)
     if message.content.startswith("!whichfa"):
-        await message.channel.send(FA)
+        await message.channel.send(fa)
     if message.content.startswith("!afa"):
         if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
-            conf_on()
-            await message.channel.send("再起動のブロックを解除しました")
+            fa_conf_on()
+            await message.channel.send("再起動のブロックを解除しました。")
     if message.content.startswith("!dfa"):
         if "モデレーターさん" in [users_role.name for users_role in message.author.roles]:
-            conf_off()
-            await message.channel.send("再起動をブロックしました")
+            fa_conf_off()
+            await message.channel.send("再起動をブロックしました。")
     if message.content.startswith("フォースアゲイン"):
         channel = client.get_channel(message.channel)
-        if "再起動不可能" in FA:
-            await message.channel.send("作業中につき再起動をブロックしています。botが暴走している場合はモデレーターへメンションしてください。") 
+        if "off" in fa:
+            await message.channel.send("作業中につき再起動をブロックしています。botが暴走している場合はモデレーターへメンションしてください。")
+            tar = discord.utils.get(message.guild)
+            print(tar)
+            #dm = await tar.create_dm()
+            #try:
+                #await dm.send("FA失敗"+"\n"+"実行:"+message.author)
+            #except discord.errors.Forbidden:
+                #pass
         else:    
             adminID = "<@366844805470486528>"
             SecondAdminID = "<@529644095027806208>"
@@ -283,6 +333,45 @@ async def on_message(message):
                 os.kill(os.getpid(), 11)
         else:
             return
+    if message.content.startswith("wakeup"):
+        channel = client.get_channel(message.channel)
+        for mem in message.mentions:
+            for i in range(int(number)):
+                a = int(mem.id)
+                print(a)
+                await message.channel.send("<@"+str(a)+">"+"さん起きて！！！")
+    if message.content.startswith("ski"):
+        o = []
+        lis = []
+        ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)" \
+             "AppleWebKit/537.36 (KHTML, like Gecko)" \
+             "Chrome/60.0.3112.113"
+        TU = "https://www.happo-one.jp/gelande/lift/"
+
+        O = requests.get(TU, headers={"User-Agent": ua})
+        RE = BeautifulSoup(O.text, "html.parser")
+        c = RE.find_all("td")
+        for d in  c:
+            o.append(d.text)
+        for i in range(20):
+            for i in range(5):
+                if o == []:
+                    break
+                a = o.pop(0)
+                b = o.pop(0)
+                c = o.pop(0)
+                d = o.pop(0)
+                e = o.pop(0)
+                A = a +" "+ b +" "+ c +" "+ d +" "+ e
+                A = A.replace("last lift up","")
+                A = A.replace("last lift down","")
+                A = A.replace("        ","  ")
+                A = A.replace("  "," ")
+                lis.append(A)
+        await message.channel.send("[リフト名][運転開始時刻][運転終了時刻][備考]")
+        for lis in lis:
+            await message.channel.send(lis)
         
+abc()
 pid = random.randrange(10001)
 client.run(TOKEN)
